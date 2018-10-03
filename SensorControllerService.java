@@ -25,15 +25,11 @@ class SensorController implements Runnable{
 		}catch(Exception e){}
 	}
 
-	//to be replaced with a listener method
-	void senseMovement(){}
 
 	public void run(){
-		Scanner s = new Scanner(System.in);
 		while(true){
 			try{
-				String event = s.nextLine();
-				sendQueue.put("MOTIONDETECTED");
+				Thread.sleep(10);
 			}catch(Exception e){}
 		}
 	}
