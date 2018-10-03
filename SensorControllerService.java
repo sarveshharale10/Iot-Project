@@ -25,7 +25,7 @@ class SensorController implements Runnable{
 		}catch(Exception e){}
 	}
 
-
+	//Can keep a infinitely sleeping thread so that it is running
 	public void run(){
 		while(true){
 			try{
