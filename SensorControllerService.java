@@ -28,7 +28,7 @@ class SensorController implements Runnable{
 			}
 			if(sendEvents.contains("MOTIONDETECTED")) {
 				gpio = GpioFactory.getInstance();
-				input = gpio.provisionDigitalInputPin(RaspiPin.GPIO_12, PinPullResistance.PULL_DOWN);
+				input = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, PinPullResistance.PULL_DOWN);
 	
 		        // create and register gpio pin listener
 		        input.addListener(new GpioPinListenerDigital() {
