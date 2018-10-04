@@ -3,6 +3,7 @@ import java.util.concurrent.*;
 import java.util.*;
 import java.io.*;
 import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.event.*;
 
 class SensorController implements Runnable{
 	GpioController gpio;
@@ -26,15 +27,17 @@ class SensorController implements Runnable{
 				}
 				
 			}
+			gpio = GpioFactory.getInstance();
+			input = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02);
 			if(sendEvents.contains("MOTIONDETECTED")) {
-				gpio = GpioFactory.getInstance();
-				input = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, PinPullResistance.PULL_DOWN);
 	
 		        // create and register gpio pin listener
 		        input.addListener(new GpioPinListenerDigital() {
 		                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
 		                    if(event.getState().isHigh()){
-		                      sendQueue.put("MOTIONDETECTED");
+		                    	try{
+		                    		sendQueue.put("MOTIONDETECTED");
+		                    	}catch(Exception e){}
 		                    }
 		                }
 		            });
@@ -43,11 +46,7 @@ class SensorController implements Runnable{
 	}
 
 	public void run(){
-		while(true){
-			try{
-				Thread.sleep(10);
-			}catch(Exception e){}
-		}
+		while(true){}
 	}
 
 }

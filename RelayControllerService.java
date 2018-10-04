@@ -19,6 +19,9 @@ class RelayController implements Runnable{
 		sendEvents = new HashSet<String>();
 		recvEvents = new HashMap<String,String>();
 
+		gpio = GpioFactory.getInstance();
+    	output = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01);
+
 		try{
 			BufferedReader inFromFile = new BufferedReader(new FileReader(fileName));
 			String line = null;
@@ -34,20 +37,21 @@ class RelayController implements Runnable{
 			}
 		}catch(Exception e){}
 	}
-	gpio = GpioFactory.getInstance();
-    output = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01);
 
 	void switchOn(){
-		output.blink(1000);
-		if(sendEvents.contains("ON")){
-			try{
+		try{
+			output.high();
+			Thread.sleep(1000);
+			output.low();
+			if(sendEvents.contains("ON")){
 				sendQueue.put("ON");
-			}catch(Exception e){}
-		}
+			}
+		}catch(Exception e){}
+		
 	}
 
 	void switchOff(){
-		led.low();
+		output.low();
 		if(sendEvents.contains("OFF")){
 			try{
 				sendQueue.put("OFF");
