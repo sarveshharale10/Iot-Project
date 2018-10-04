@@ -2,10 +2,13 @@ import java.net.*;
 import java.util.concurrent.*;
 import java.util.*;
 import java.io.*;
+import com.pi4j.io.gpio.*;
 
 class SensorController implements Runnable{
-	HashSet<String> sendEvents;
+	GpioController gpio;
+	GpioPinDigitalInput input;
 
+	HashSet<String> sendEvents;
 	BlockingQueue<String> sendQueue;
 
 	SensorController(BlockingQueue<String> sendQueue,String fileName){
@@ -21,11 +24,24 @@ class SensorController implements Runnable{
 				if(type.compareTo("SEND") == 0){
 					sendEvents.add(st.nextToken());
 				}
+				
+			}
+			if(sendEvents.contains("MOTIONDETECTED")) {
+				gpio = GpioFactory.getInstance();
+				input = gpio.provisionDigitalInputPin(RaspiPin.GPIO_12, PinPullResistance.PULL_DOWN);
+	
+		        // create and register gpio pin listener
+		        input.addListener(new GpioPinListenerDigital() {
+		                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+		                    if(event.getState().isHigh()){
+		                      sendQueue.put("MOTIONDETECTED");
+		                    }
+		                }
+		            });
 			}
 		}catch(Exception e){}
 	}
 
-	//Can keep an infinitely sleeping thread so that it is running
 	public void run(){
 		while(true){
 			try{
