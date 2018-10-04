@@ -2,6 +2,7 @@ import java.net.*;
 import java.util.concurrent.*;
 import java.util.*;
 import java.io.*;
+import com.pi4j.io.gpio.*;
 
 class SensorController implements Runnable{
 	HashSet<String> sendEvents;
@@ -21,20 +22,38 @@ class SensorController implements Runnable{
 				if(type.compareTo("SEND") == 0){
 					sendEvents.add(st.nextToken());
 				}
+				
 			}
+			if(sendEvents.contains("MOTIONDETECTED")) {
+				final GpioController gpio= GpioFactory.getInstance();
+				final GpioPinDigitalInput input = gpio.provisionDigitalInputPin(RaspiPin.GPIO_12, PinPullResistance.PULL_DOWN);
+	
+		        // create and register gpio pin listener
+		        input.addListener(new GpioPinListenerDigital() {
+		                @Override
+		                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+		                    if(event.getState().isHigh()){
+		                      sendQueue.put("MOTIONDETECTED");
+		                    }
+		                }
+		            });
+			}//end of if
 		}catch(Exception e){}
 	}
 
 	//to be replaced with a listener method
-	void senseMovement(){}
+	void senseMovement(){
+		
+	}
 
 	public void run(){
-		Scanner s = new Scanner(System.in);
+		//Scanner s = new Scanner(System.in);
 		while(true){
-			try{
-				String event = s.nextLine();
-				sendQueue.put("MOTIONDETECTED");
-			}catch(Exception e){}
+			/*try{
+				//String event = s.nextLine();
+				//if(senseMovement())
+					sendQueue.put("MOTIONDETECTED");
+			}catch(Exception e){}*/
 		}
 	}
 

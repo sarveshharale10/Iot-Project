@@ -1,4 +1,5 @@
 import java.util.*;
+import com.pi4j.io.gpio.*;
 import java.util.concurrent.*;
 import java.io.*;
 
@@ -31,10 +32,12 @@ class RelayController implements Runnable{
 			}
 		}catch(Exception e){}
 	}
+	final GpioController gpio = GpioFactory.getInstance();
+    final GpioPinDigitalOutput led = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01);
 
 	void switchOn(){
-		//whatever to switch on
-		System.out.println("Switched on");
+		led.blink(1000);
+		//System.out.println("Switched on");
 		if(sendEvents.contains("ON")){
 			try{
 				sendQueue.put("ON");
@@ -44,7 +47,8 @@ class RelayController implements Runnable{
 
 	void switchOff(){
 		//whatever to switch off
-		System.out.println("Switched off");
+		led.low();
+		//System.out.println("Switched off");
 		if(sendEvents.contains("OFF")){
 			try{
 				sendQueue.put("OFF");
